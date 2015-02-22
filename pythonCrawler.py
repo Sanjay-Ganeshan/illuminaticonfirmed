@@ -1,12 +1,50 @@
 import httplib
 import re
+import urllib
+import json
 
-str1 = "http://en.wikipedia.org/w/index.php?title=Special:WhatLinksHere/Illuminati&namespace=0&limit=50000"
-con1 = httplib.HTTPConnection("en.wikipedia.org")
-pathToTool = "/w/index.php?title=Special:WhatLinksHere/"
-keyword = "Illuminati"
-namespaceStr = "&namespace="
-namespace = 0
-limitStr
-limit = 50000
-con1.putrequest("POST",pathToTool + keyword + namespaceStr + str(namespace) + )
+def getWikipediaLinkedPage(keyword):
+	url = "http://en.wikipedia.org/w/index.php?title=Special:WhatLinksHere/"+keyword+"&namespace=0&limit=50000"
+	search_response = urllib.urlopen(url)
+	search_results = search_response.read()
+	return search_results
+
+def getWikipediaLinkedPageTitles(keyword):
+	webpage = getWikipediaLinkedPage(keyword)
+	webpageSplit = webpage.split("<li><a")
+	search = re.compile(">\w*\s*\w*<")
+	found = ""
+	allFound = []
+	for eachItem in webpageSplit:
+		if eachItem[0:4] == " hre":
+			found = search.findall(eachItem)[0]
+			if not("links" in found):
+				allFound.append(found[1:-1])
+	return allFound
+
+def expandPath(path):
+	newPaths = []
+	linkedTitles = getWikipediaLinkedPageTitles(path[0])
+	for eachTitle in linkedTitles:
+		newPaths.append([eachTitle] + path)
+	return newPaths
+
+allPaths = [["Illuminati"],["Triangle"],["Eye"],["Pyramid"],["Person"]]
+newAllPaths = []
+numPathsDone = 0
+for i in range(5):
+	for eachPath in allPaths:
+		numPathsDone += 1
+		if numPathsDone > 100:
+			break
+		newAllPaths += expandPath(eachPath)
+	numPathsDone  = 0
+	allPaths = newAllPaths
+	newAllPaths = []
+f = open("results30By5.txt","w")
+for eachResult in allPaths:
+	f.write(str(eachResult)+"\n")
+
+
+#print search.findall(webpage)
+#print re.findall("<a>",webpage)
