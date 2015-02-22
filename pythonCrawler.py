@@ -34,14 +34,11 @@ newAllPaths = []
 numPathsDone = 0
 for i in range(5):
 	for eachPath in allPaths:
-		numPathsDone += 1
-		if numPathsDone > 100:
-			break
 		newAllPaths += expandPath(eachPath)
-	numPathsDone  = 0
 	allPaths = newAllPaths
 	newAllPaths = []
-f = open("results30By5.txt","w")
+	print "Finished Layer"
+f = open("resultsFull.txt","w")
 for eachResult in allPaths:
 	f.write(str(eachResult)+"\n")
 
